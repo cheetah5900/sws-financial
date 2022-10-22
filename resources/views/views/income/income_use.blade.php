@@ -1,0 +1,107 @@
+@extends('layout')
+@section('content')
+<div class="container" style="max-width:80%;">
+    <div class="row mt-3">
+        <div class="col">
+            <p class="h3">ใช้ยอดรายรับ {{number_format($advanceDataDocs['advance_value'],2)}} บาท ของวันที่ {{$advanceDataDocs['advance_date']}} </p>
+        </div>
+    </div>
+    <div class="row my-5">
+        <div class="col">
+            <a href="" class=" btn btn-secondary">ย้อนกลับ</a>
+        </div>
+    </div>
+    <div class="row mt-5">
+        <div class="col">
+            <p class="h5"><b>ยอดทั้งหมด</b> {{number_format($advanceDataDocs['advance_value'],2)}} บาท</p>
+            <p class="h5"><b>ยอดที่ใช้ไป</b> {{number_format($advanceDataDocs['advance_used'],2)}} บาท</p>
+            <p class="h5"><b>ยอดคงเหลือ</b> {{number_format($advanceDataDocs['advance_remain'],2)}} บาท</p>
+        </div>
+    </div>
+
+    <!-- ตัวแปร success ย้อนกลับของ การเพิ่มยอด Advance -->
+
+    @if(session("successadvance"))
+    <div class="row">
+        <div class="col">
+            <div class="form-control-wrap">
+                <div class="alert alert-success">
+                    <strong>{{session('successadvance')}}</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
+    <div class="row mt-5">
+        <div class="col">
+            <div class="row">
+                <div class="col">
+                    <form action="/advance/updateavuse" method="post" enctype="multipart/form-data">
+                        @csrf
+                        <table class="table table-striped table-bordered" style="width:100%">
+                            <tr>
+                                <td>ยอดที่จะใช้<span class="text-danger">*</span></td>
+                                <td><input type="text" name="advanceValue" class="form-control"></td>
+                            </tr>
+                            <tr>
+                                <td>เบิกจ่ายที่จะใช้</td>
+                                <td>
+                                    <select class="form-control" name="disburseId" id="">
+                                        @foreach($disburseSelected as $row)
+                                        <option value="{{$row['id']}}">{{$row['id']}} - {{$row['vendor']}} => {{$row['disburse_name']}} => คงเหลือ {{number_format($row['value'],2)}} บาท</option>
+                                        @endforeach
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>หมายเหตุ</td>
+                                <td><input type="text" name="remark" class="form-control" id=""></td>
+                            </tr>
+                        </table>
+                        <div class="text-center">
+                            <input type="hidden" name="type" value="(ยอดรายรับ)">
+                            <input type="hidden" name="advanceId" value="{{$advanceDataDocs['id']}}" id="">
+                            <button type="submit" class="btn btn-success">บันทึก</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-5">
+        <div class="col">
+            <p class="h3">รายการที่ใช้ไป</p>
+        </div>
+    </div>
+    <div class="row mt-2">
+        <div class="col text-right mt-3">
+            <table id="example" class="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <td>ยอดใช้ไป</td>
+                        <td>รายการเบิกจ่ายที่ใช้</td>
+                        <td>วันที่โอน</td>
+                        <td>หมายเหตุ</td>
+                        <td>รายละเอียดเบิกจ่าย</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($advanceUseArr as $row)
+                    <tr>
+                        <td>{{$row['advance_value']}}</td>
+                        <td>{{$row['disburse_name']}}</td>
+                        <td>{{$row['advance_date']}}</td>
+                        <td>{{$row['remark']}}</td>
+                        <td><a href="/disburse/detail/{{$row['disburse_id']}}" target="_blank" class="btn btn-primary">รายละเอียด</a></td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+<script src="{{asset('js/app.js')}}"></script>
+@stop
